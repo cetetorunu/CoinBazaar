@@ -12,11 +12,11 @@ namespace CoinBazaar.Transfer.Application.CommandHandlers
 {
     public class TransferCommandHandler : IRequestHandler<CreateTransferCommand, DomainCommandResponse>
     {
-        private readonly IEventRepository _eventRepository;
+        //private readonly IEventRepository _eventRepository;
         private readonly IChannel _channel;
-        public TransferCommandHandler(IEventRepository eventRepository, IChannel channel)
+        public TransferCommandHandler(/*IEventRepository eventRepository,*/ IChannel channel)
         {
-            _eventRepository = eventRepository;
+            //_eventRepository = eventRepository;
             _channel = channel;
         }
 
@@ -24,13 +24,13 @@ namespace CoinBazaar.Transfer.Application.CommandHandlers
         {
             var aggregateRoot = new TransferAggregateRoot(Guid.NewGuid(), request.FromWallet, request.ToWallet, request.Amount);
 
-            await _eventRepository.SaveAsync(aggregateRoot).ConfigureAwait(false);
+            //await _eventRepository.SaveAsync(aggregateRoot).ConfigureAwait(false);
 
             await _channel.Publish(new CreateTransferCommand() { Amount = 10, FromWallet = "Gökhan" });
 
-            
-            return await _eventRepository.Publish(domainEventResult);
-            //return new DomainCommandResponse { AggregateId = aggregateRoot.AggregateId, CreationDate = DateTime.UtcNow };
+
+            //return await _eventRepository.Publish(domainEventResult);
+            return new DomainCommandResponse { AggregateId = aggregateRoot.AggregateId, CreationDate = DateTime.UtcNow };
         }
     }
 }

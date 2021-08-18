@@ -25,22 +25,22 @@ namespace CoinBazaar.Transfer.ESConsumer.gRPC
         private readonly EventStoreOptions _eventStoreOptions;
         private readonly BPMContext _bpmContext;
         private readonly IBPMNRepository _bpmnRepository;
-        private readonly IEventSourceRepository _eventRepository;
+        //private readonly IEventRepository _eventRepository;
 
         public ConsumerWorker(
             ILogger<ConsumerWorker> logger,
             EventStorePersistentSubscriptionsClient eventStorePersistentSubscription,
             EventStoreOptions eventStoreOptions,
             BPMContext bpmContext,
-            IBPMNRepository bpmnRepository,
-            IEventSourceRepository eventRepository)
+            IBPMNRepository bpmnRepository/*,
+            IEventRepository eventRepository*/)
         {
             _logger = logger;
             _eventStorePersistentSubscription = eventStorePersistentSubscription;
             _eventStoreOptions = eventStoreOptions;
             _bpmContext = bpmContext;
             _bpmnRepository = bpmnRepository;
-            _eventRepository = eventRepository;
+            //_eventRepository = eventRepository;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -80,45 +80,49 @@ namespace CoinBazaar.Transfer.ESConsumer.gRPC
                 return;
             }
 
-            var metadata = JsonSerializer.Deserialize<EventSourceMetadata>(Encoding.UTF8.GetString(@event.Event.Metadata.Span));
+            //var metadata = JsonSerializer.Deserialize<ESMetadata>(Encoding.UTF8.GetString(@event.Event.Metadata.Span));
 
-            if (metadata?.ProcessStarter == true)
-            {
-                //event pointed to process starter.
-                var processStarterEvent = JsonSerializer.Deserialize<ProcessStarterEvent>(Encoding.UTF8.GetString(@event.Event.Data.Span));
+            //if (metadata?.ProcessStarter == true)
+            //{
+            //    //event pointed to process starter.
+            //    var processStarterEvent = JsonSerializer.Deserialize<ProcessStarterEvent>(Encoding.UTF8.GetString(@event.Event.Data.Span));
 
-                var filter = Builders<Process>.Filter.Eq(x => x.ProcessId, processStarterEvent.ProcessId);
+            //    var filter = Builders<Process>.Filter.Eq(x => x.ProcessId, processStarterEvent.ProcessId);
 
-                var process = (await _bpmContext.Processes.FindAsync(filter)).FirstOrDefault();
+            //    var process = (await _bpmContext.Processes.FindAsync(filter)).FirstOrDefault();
 
-                if (process != null)
-                {
-                    _logger.LogWarning($"Idempotent Process Exception. Process started with same Id. Process Id: {processStarterEvent.ProcessId}");
-                    return;
-                }
+            //    if (process != null)
+            //    {
+            //        _logger.LogWarning($"Idempotent Process Exception. Process started with same Id. Process Id: {processStarterEvent.ProcessId}");
+            //        return;
+            //    }
 
-                process = new Process()
-                {
-                    ProcessId = processStarterEvent.ProcessId,
-                    ProcessName = processStarterEvent.ProcessName,
-                    CreationDate = DateTime.UtcNow
-                };
+            //    process = new Process()
+            //    {
+            //        ProcessId = processStarterEvent.ProcessId,
+            //        ProcessName = processStarterEvent.ProcessName,
+            //        CreationDate = DateTime.UtcNow
+            //    };
 
-                await _bpmContext.Processes.InsertOneAsync(process);
+            //    await _bpmContext.Processes.InsertOneAsync(process);
 
-                _bpmnRepository.StartProcessInstance(processStarterEvent.ProcessName, processStarterEvent.ProcessParameters);
-            }
+            //    _bpmnRepository.StartProcessInstance(processStarterEvent.ProcessName, processStarterEvent.ProcessParameters);
+            //}
 
-            //Redirect to aggregateRoot for apply all events.
+            ////Redirect to aggregateRoot for apply all events.
 
-            if (metadata != null && metadata.StreamId != default)
-            {
-                var aggregateRoot = await _eventRepository.FindByIdAsync<TransferAggregateRoot>(metadata.StreamId).ConfigureAwait(false);
+            //if (metadata != null && metadata.StreamId != default)
+            //{
+            //    //var events = await _eventRepository.GetAllEvents(metadata.StreamId);
 
-                //Read db için aggregate kullanýlacak
+            //    //var manager = new Infrastructure.Aggregates.AggregateManager<TransferAggregateRoot>();
 
-                //return Task.CompletedTask;
-            }
+            //    //var aggregateRoot = manager.ApplyAll(metadata.StreamId, events);
+
+            //    //Read db için aggregate kullanýlacak
+
+            //    //return Task.CompletedTask;
+            //}
         }
     }
 }

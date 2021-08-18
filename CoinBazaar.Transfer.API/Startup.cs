@@ -15,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
+namespace CoinBazaar.Transfer.API
+{
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -75,4 +77,5 @@ using Microsoft.OpenApi.Models;
             });
         }
     }
+
 }
