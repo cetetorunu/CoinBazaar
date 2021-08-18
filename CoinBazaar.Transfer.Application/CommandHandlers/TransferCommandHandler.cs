@@ -1,23 +1,23 @@
-﻿namespace CoinBazaar.Transfer.Application.CommandHandlers
+﻿using CoinBazaar.Infrastructure.EventBus;
+using CoinBazaar.Infrastructure.MessageQueue;
+using CoinBazaar.Infrastructure.Models;
+using CoinBazaar.Transfer.Application.Commands;
+using CoinBazaar.Transfer.Domain;
+using MediatR;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace CoinBazaar.Transfer.Application.CommandHandlers
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using CoinBazaar.Infrastructure.EventBus;
-    using CoinBazaar.Infrastructure.Models;
-    using CoinBazaar.Transfer.Application.Commands;
-    using CoinBazaar.Transfer.Domain;
-
-    using MediatR;
-
-    public sealed class TransferCommandHandler : IRequestHandler<CreateTransferCommand, DomainCommandResponse>
+    public class TransferCommandHandler : IRequestHandler<CreateTransferCommand, DomainCommandResponse>
     {
-        private readonly IEventSourceRepository _eventRepository;
-
-        public TransferCommandHandler(IEventSourceRepository eventRepository)
+        private readonly IEventRepository _eventRepository;
+        private readonly IChannel _channel;
+        public TransferCommandHandler(IEventRepository eventRepository, IChannel channel)
         {
             _eventRepository = eventRepository;
+            _channel = channel;
         }
 
         public async Task<DomainCommandResponse> Handle(CreateTransferCommand request, CancellationToken cancellationToken)
@@ -26,7 +26,11 @@
 
             await _eventRepository.SaveAsync(aggregateRoot).ConfigureAwait(false);
 
-            return new DomainCommandResponse { AggregateId = aggregateRoot.AggregateId, CreationDate = DateTime.UtcNow };
+            await _channel.Publish(new CreateTransferCommand() { Amount = 10, FromWallet = "Gökhan" });
+
+            
+            return await _eventRepository.Publish(domainEventResult);
+            //return new DomainCommandResponse { AggregateId = aggregateRoot.AggregateId, CreationDate = DateTime.UtcNow };
         }
     }
 }

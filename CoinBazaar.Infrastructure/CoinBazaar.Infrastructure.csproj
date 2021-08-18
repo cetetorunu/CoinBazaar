@@ -7,7 +7,10 @@
     <PackageReference Include="Camunda.Api.Client" Version="2.6.0" />
     <PackageReference Include="EventStore.Client.Grpc.Streams" Version="21.2.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.38.0" />
+    <PackageReference Include="MediatR" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
 </Project>

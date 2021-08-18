@@ -1,9 +1,11 @@
-﻿using CoinBazaar.Infrastructure.Models;
+﻿using CoinBazaar.Infrastructure.MessageQueue;
+using CoinBazaar.Infrastructure.Models;
 using MediatR;
 
 namespace CoinBazaar.Transfer.Application.Commands
 {
-    public class CreateTransferCommand : IRequest<DomainCommandResponse>
+    [ConsumerTopic("CreateTransferCommand")]
+    public class CreateTransferCommand : IRequest<DomainCommandResponse>, INotification
     {
         public string FromWallet { get; set; }
         public string ToWallet { get; set; }

@@ -65,6 +65,16 @@ services:
       - type: volume
         source: eventstore-volume-logs
         target: /var/log/eventstore
+  Camunda:
+    image: camunda/camunda-bpm-platform:latest
+    container_name: camunda
+    build:
+      context: Camunda
+      dockerfile: Dockerfile
+    networks:
+      new:
+        aliases: 
+          - camunda
 
 volumes:
   eventstore-volume-data:

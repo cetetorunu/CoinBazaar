@@ -19,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoinBazaar.Infrastructure.MessageQueue.Camunda\CoinBazaar.Infrastructure.MessageQueue.Camunda.csproj" />
+    <ProjectReference Include="..\CoinBazaar.Infrastructure.MessageQueue.Rabbit\CoinBazaar.Infrastructure.MessageQueue.Rabbit.csproj" />
     <ProjectReference Include="..\CoinBazaar.Transfer.Application\CoinBazaar.Transfer.Application.csproj" />
   </ItemGroup>
 

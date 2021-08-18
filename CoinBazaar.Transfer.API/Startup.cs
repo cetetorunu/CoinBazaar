@@ -1,22 +1,19 @@
-namespace CoinBazaar.Transfer.API
-{
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
-
-    using CoinBazaar.Infrastructure.EventBus;
-    using CoinBazaar.Transfer.Application.CommandHandlers;
-    using CoinBazaar.Transfer.Application.Infrastructure.AutofacModules;
-
-    using EventStore.Client;
-
-    using MediatR;
-
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.OpenApi.Models;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using CoinBazaar.Infrastructure.EventBus;
+using CoinBazaar.Infrastructure.MessageQueue;
+using CoinBazaar.Infrastructure.MessageQueue.Camunda;
+using CoinBazaar.Infrastructure.MessageQueue.Rabbit;
+using CoinBazaar.Transfer.Application.CommandHandlers;
+using CoinBazaar.Transfer.Application.Infrastructure.AutofacModules;
+using EventStore.Client;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
     public class Startup
     {
@@ -46,6 +43,14 @@ namespace CoinBazaar.Transfer.API
 
             container.RegisterModule(new MediatorModule());
             container.RegisterModule(new ApplicationModule(Configuration["ConnectionString"]));
+
+            //services.AddSingleton<IConnection, RabbitMQConnection>();
+            services.AddSingleton<IConnection, CamundaConnection>();
+            services.AddSingleton<IChannel>(s =>
+            {
+                return s.GetRequiredService<IConnection>().CreateChannel();
+            });
+            services.AddHostedService<ConsumerHostedService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

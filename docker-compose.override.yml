@@ -19,6 +19,9 @@ services:
       - "5004:443"
     volumes:
       - ~/ASP.NET/Https:/root/.aspnet/https:ro
+  Camunda:
+    ports:
+      - "8080:8080"
 
   coinbazaar.transfer.esconsumer.grpc:
     volumes:
